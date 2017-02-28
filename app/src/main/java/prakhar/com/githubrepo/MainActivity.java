@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     RepoAdapter repoAdapter;
     ArrayList<GithubRepo.Item> repoArrayList;
     Toolbar toolbar;
-    String globalquery;
+    String globalquery = "Github Repo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 //Do some magic
             }
         });
-
 
         //if (NetworkUtils.isNetworkConnected(MainActivity.this)) {
 
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         System.out.println("TAG, onSavedInstanceState");
 
-        outState.putString("query",globalquery);
+        outState.putString("query", globalquery);
         outState.putParcelableArrayList("ParceableRepoList", repoArrayList);
     }
 
@@ -148,13 +147,14 @@ public class MainActivity extends AppCompatActivity {
 
         globalquery = savedState.getString("query");
 
-        toolbar.setTitle(globalquery);
-        toolbar.setTitleTextColor(Color.WHITE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        toolbar.setTitle(globalquery);
+        toolbar.setTitleTextColor(Color.WHITE);
 
     }
 

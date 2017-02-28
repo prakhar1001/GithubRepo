@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">GithubRepo</string>
+
+    <string name="font_family_open_sans_semi_bold">OpenSansSemiBold</string>
+    <string name="font_family_open_sans_semi_bold_italic">OpenSansSemiBoldItalic</string>
+
+    <string-array name="query_suggestions">
+        <item>okhttp</item>
+        <item>Android</item>
+        <item>Java</item>
+        <item>Artificial Intelligence</item>
+    </string-array>
+
+</resources>

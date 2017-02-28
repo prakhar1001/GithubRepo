@@ -4,12 +4,15 @@ package prakhar.com.githubrepo;
  * Created by lendingkart on 2/27/2017.
  */
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class GithubRepo {
+public class GithubRepo implements Parcelable{
 
     @SerializedName("total_count")
     @Expose
@@ -20,6 +23,21 @@ public class GithubRepo {
     @SerializedName("items")
     @Expose
     private List<Item> items = null;
+
+    protected GithubRepo(Parcel in) {
+    }
+
+    public static final Creator<GithubRepo> CREATOR = new Creator<GithubRepo>() {
+        @Override
+        public GithubRepo createFromParcel(Parcel in) {
+            return new GithubRepo(in);
+        }
+
+        @Override
+        public GithubRepo[] newArray(int size) {
+            return new GithubRepo[size];
+        }
+    };
 
     public Integer getTotalCount() {
         return totalCount;
@@ -38,23 +56,69 @@ public class GithubRepo {
         this.items = items;
     }
 
-}
-
-class Item {
-
-    @SerializedName("full_name")
-    @Expose
-    private String fullName;
-
-    public String getFullName() {
-        return fullName;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
     }
 
 
+    public class Item implements Parcelable{
+
+        @SerializedName("full_name")
+        @Expose
+        private String fullName;
+        @SerializedName("html_url")
+        @Expose
+        private String htmlUrl;
+
+        protected Item(Parcel in) {
+            fullName = in.readString();
+            htmlUrl = in.readString();
+        }
+
+        public final Creator<Item> CREATOR = new Creator<Item>() {
+            @Override
+            public Item createFromParcel(Parcel in) {
+                return new Item(in);
+            }
+
+            @Override
+            public Item[] newArray(int size) {
+                return new Item[size];
+            }
+        };
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public void setFullName(String fullName) {
+            this.fullName = fullName;
+        }
+
+        public String getHtmlUrl() {
+            return htmlUrl;
+        }
+
+        public void setHtmlUrl(String htmlUrl) {
+            this.htmlUrl = htmlUrl;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(fullName);
+            dest.writeString(htmlUrl);
+        }
+    }
+
+
 }
-
-

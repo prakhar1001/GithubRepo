@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,7 +17,7 @@ public class RepoAdapter extends BaseAdapter {
 
     RepoViewHolder viewHolder;
     Context context;
-    ArrayList<Item> repolist = null;
+    ArrayList<GithubRepo.Item> repolist = null;
 
     public RepoAdapter(Context context, ArrayList repolist) {
         this.context = context;
@@ -25,7 +26,7 @@ public class RepoAdapter extends BaseAdapter {
         }
     }
 
-    public void addData(ArrayList<Item> repolist) {
+    public void addData(ArrayList<GithubRepo.Item> repolist) {
         this.repolist = repolist;
         notifyDataSetChanged();
     }
@@ -46,7 +47,7 @@ public class RepoAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.repo_item_row, parent, false);
@@ -56,6 +57,12 @@ public class RepoAdapter extends BaseAdapter {
             viewHolder = (RepoViewHolder) convertView.getTag();
         }
         viewHolder.RepoTitle.setText(this.repolist.get(position).getFullName());
+        viewHolder.RepoTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,repolist.get(position).getHtmlUrl(),Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return convertView;
     }

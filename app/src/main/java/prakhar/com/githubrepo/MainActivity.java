@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     MaterialSearchView searchView;
     RepoAdapter repoAdapter;
+    ArrayList<GithubRepo.Item> repoArrayList;
     Toolbar toolbar;
+    String globalquery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +41,10 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        repoAdapter = new RepoAdapter(MainActivity.this, new ArrayList<Item>());
+        // TODO: 2/28/2017 get arraylist of bookmarked repos from database with their html urls
+        repoAdapter = new RepoAdapter(MainActivity.this, new ArrayList<GithubRepo.Item>());
         repoListView.setAdapter(repoAdapter);
+
 
         searchView = (MaterialSearchView) findViewById(R.id.search_view);
         searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
@@ -90,8 +94,10 @@ public class MainActivity extends AppCompatActivity {
                 dismissProgress();
                 toolbar.setTitle(query);
                 toolbar.setTitleTextColor(Color.WHITE);
-                ArrayList<Item> repoArrayList = new ArrayList<Item>();
-                repoArrayList = (ArrayList<Item>) response.body().getItems();
+
+                globalquery = query;
+                repoArrayList = new ArrayList<GithubRepo.Item>();
+                repoArrayList = (ArrayList<GithubRepo.Item>) response.body().getItems();
                 if (repoArrayList.size() > 0) {
                     repoAdapter.addData(repoArrayList);
                 } else
@@ -124,6 +130,26 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        System.out.println("TAG, onSavedInstanceState");
+
+        outState.putString("query",globalquery);
+        outState.putParcelableArrayList("ParceableRepoList", repoArrayList);
+    }
+
+    protected void onRestoreInstanceState(Bundle savedState) {
+        System.out.println("TAG, onRestoreInstanceState");
+
+        repoArrayList = savedState.getParcelableArrayList("ParceableRepoList");
+        repoAdapter.addData(repoArrayList);
+
+        globalquery = savedState.getString("query");
+
+        toolbar.setTitle(globalquery);
+        toolbar.setTitleTextColor(Color.WHITE);
     }
 
     @Override

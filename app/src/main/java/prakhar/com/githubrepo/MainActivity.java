@@ -198,6 +198,8 @@ public class MainActivity extends AppCompatActivity {
             mRepoListStatus = false;
             mRepoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
             mRepoListView.setAdapter(mRepoAdapter);
+            mToolbar.setTitle("Bookmarked Repos");
+            mToolbar.setTitleTextColor(Color.WHITE);
         }
 
 
@@ -217,7 +219,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mToolbar.setTitle("Query : " + mGlobalQuery);
+        if (!mGlobalQuery.equals("Github Repo"))
+            mToolbar.setTitle("Query : " + mGlobalQuery);
+        else
+            mToolbar.setTitle("Bookmarked Repos");
         mToolbar.setTitleTextColor(Color.WHITE);
 
     }

@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<GithubRepo> call, Response<GithubRepo> response) {
                 dismissProgress();
-                mToolbar.setTitle(query);
+                mToolbar.setTitle("Query : " + query);
                 mToolbar.setTitleTextColor(Color.WHITE);
                 mGlobalQuery = query;
                 mRepoListStatus = true;
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mToolbar.setTitle(mGlobalQuery);
+        mToolbar.setTitle("Query : " + mGlobalQuery);
         mToolbar.setTitleTextColor(Color.WHITE);
 
     }

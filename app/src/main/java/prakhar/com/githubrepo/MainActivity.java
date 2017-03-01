@@ -2,6 +2,7 @@ package prakhar.com.githubrepo;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,13 +10,20 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import prakhar.com.githubrepo.db.DaoMaster;
+import prakhar.com.githubrepo.db.DaoSession;
+import prakhar.com.githubrepo.db.Repo;
+import prakhar.com.githubrepo.db.RepoDao;
 import prakhar.com.githubrepo.network.RetroClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,27 +31,49 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //Dao --> Data Access Object
+    private RepoDao repoDao; // Sql access object
+    private Repo repo; // Used for creating a LOG Object
+
+
+    private final String DB_NAME = "repo-db";  //Name of Db file in the Device
+
+    ListView repoListView;
     private ProgressDialog mProgressDialog;
     MaterialSearchView searchView;
     RepoAdapter repoAdapter;
     ArrayList<GithubRepo.Item> repoArrayList;
     Toolbar toolbar;
     String globalquery = "Github Repo";
+    boolean repoListStatus = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ListView repoListView = (ListView) findViewById(R.id.repolist);
+        repoListView = (ListView) findViewById(R.id.repolist);
 
         mProgressDialog = displayProgressDialog(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        repoDao = setup_db();
+
         // TODO: 2/28/2017 get arraylist of bookmarked repos from database with their html urls
-        repoAdapter = new RepoAdapter(MainActivity.this, new ArrayList<GithubRepo.Item>());
+        repoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
         repoListView.setAdapter(repoAdapter);
+
+        repoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (repoArrayList != null) {
+                    repo = new Repo(null, repoArrayList.get(position).getFullName(), repoArrayList.get(position).getHtmlUrl());
+                    saveObjectToSQL(repo);
+                }
+            }
+        });
 
 
         searchView = (MaterialSearchView) findViewById(R.id.search_view);
@@ -83,6 +113,42 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
+    public ArrayList<GithubRepo.Item> changeRepoToGithubItem(List<Repo> repo) {
+
+        ArrayList<GithubRepo.Item> repoarraylist = new ArrayList<>(repo.size());
+        if (repo.size() > 0) {
+            for (int position = 0; position < repo.size(); position++) {
+                GithubRepo.Item repoitem = new GithubRepo.Item(null);
+                repoitem.setFullName(repo.get(position).getTitle());
+                repoitem.setHtmlUrl(repo.get(position).getHtml_url());
+
+                repoarraylist.add(repoitem);
+            }
+        } else {
+            GithubRepo.Item repoitem = new GithubRepo.Item(null);
+            repoitem.setFullName("No Repository has been bookmarked");
+            repoitem.setHtmlUrl(null);
+
+            repoarraylist.add(repoitem);
+
+        }
+        return repoarraylist;
+    }
+
+    public List<Repo> getFromSQL() {
+        List<Repo> repo_List = repoDao.queryBuilder().orderDesc(RepoDao.Properties.Id).build().list();
+        //Get the list of all LOGS in Database in descending order
+
+        if (repo_List.size() > 0) {  //if list is not null
+
+            return repo_List;
+            //get(0)--> 1st object
+            // getText() is the function in LOG class
+        }
+        return repo_List;
+    }
+
+
     private void callGithubRepoAPI(final String query) {
 
         showProgress();
@@ -93,8 +159,8 @@ public class MainActivity extends AppCompatActivity {
                 dismissProgress();
                 toolbar.setTitle(query);
                 toolbar.setTitleTextColor(Color.WHITE);
-
                 globalquery = query;
+                repoListStatus = true;
                 repoArrayList = new ArrayList<GithubRepo.Item>();
                 repoArrayList = (ArrayList<GithubRepo.Item>) response.body().getItems();
                 if (repoArrayList.size() > 0) {
@@ -107,10 +173,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<GithubRepo> call, Throwable t) {
                 dismissProgress();
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.d("failure", t.getMessage());
             }
         });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,9 +194,16 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (searchView.isSearchOpen()) {
             searchView.closeSearch();
-        } else {
+        } else if (!searchView.isSearchOpen() && !repoListStatus) {
             super.onBackPressed();
         }
+        if (repoListStatus) {
+            repoListStatus = false;
+            repoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
+            repoListView.setAdapter(repoAdapter);
+        }
+
+
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -195,4 +270,20 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.dismiss();
         return progressDialog;
     }
+
+
+    public void saveObjectToSQL(Repo repo_object) {
+        repoDao.insert(repo_object);
+    }
+
+    //Return the Configured LogDao Object
+    public RepoDao setup_db() {
+        DaoMaster.DevOpenHelper masterHelper = new DaoMaster.DevOpenHelper(this, DB_NAME, null); //create database db file if not exist
+        SQLiteDatabase db = masterHelper.getWritableDatabase();  //get the created database db file
+        DaoMaster master = new DaoMaster(db);//create masterDao
+        DaoSession masterSession = master.newSession(); //Creates Session session
+        return masterSession.getRepoDao();
+    }
+
+
 }

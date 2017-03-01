@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class GithubRepo implements Parcelable{
+public class GithubRepo implements Parcelable {
 
     @SerializedName("total_count")
     @Expose
@@ -66,7 +66,7 @@ public class GithubRepo implements Parcelable{
     }
 
 
-    public class Item implements Parcelable{
+    public static class Item implements Parcelable {
 
         @SerializedName("full_name")
         @Expose
@@ -76,8 +76,10 @@ public class GithubRepo implements Parcelable{
         private String htmlUrl;
 
         protected Item(Parcel in) {
-            fullName = in.readString();
-            htmlUrl = in.readString();
+            if (in != null) {
+                fullName = in.readString();
+                htmlUrl = in.readString();
+            }
         }
 
         public final Creator<Item> CREATOR = new Creator<Item>() {

@@ -6,14 +6,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import prakhar.com.githubrepo.db.Repo;
+import prakhar.com.githubrepo.db.RepoDao;
 
 /**
  * Created by lendingkart on 2/27/2017.
  */
 public class RepoAdapter extends BaseAdapter {
+
+    //Dao --> Data Access Object
+    private RepoDao repoDao; // Sql access object
+    private Repo repo; // Used for creating a LOG Object
+
+    private final String DB_NAME = "repo-db";  //Name of Db file in the Device
 
     RepoViewHolder viewHolder;
     Context context;
@@ -56,24 +64,20 @@ public class RepoAdapter extends BaseAdapter {
         } else {
             viewHolder = (RepoViewHolder) convertView.getTag();
         }
+
         viewHolder.RepoTitle.setText(this.repolist.get(position).getFullName());
-        viewHolder.RepoTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context,repolist.get(position).getHtmlUrl(),Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return convertView;
     }
-}
 
-class RepoViewHolder {
-    TextView RepoTitle;
 
-    RepoViewHolder(View view) {
-        RepoTitle = (TextView) view.findViewById(R.id.repotitle);
+    class RepoViewHolder {
+        TextView RepoTitle;
+
+        RepoViewHolder(View view) {
+            RepoTitle = (TextView) view.findViewById(R.id.repotitle);
+
+        }
 
     }
-
 }

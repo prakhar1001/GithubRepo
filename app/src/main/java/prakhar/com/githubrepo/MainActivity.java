@@ -181,7 +181,8 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("TAG, onRestoreInstanceState");
 
         mRepoArrayList = savedState.getParcelableArrayList("ParceableRepoList");
-        mRepoAdapter.addData(mRepoArrayList);
+        if (mRepoArrayList != null)
+            mRepoAdapter.addData(mRepoArrayList);
 
         mGlobalQuery = savedState.getString("query");
 

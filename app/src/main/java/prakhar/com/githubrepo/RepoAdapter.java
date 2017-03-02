@@ -25,7 +25,7 @@ public class RepoAdapter extends BaseAdapter {
 
     RepoViewHolder viewHolder;
     Context context;
-    ArrayList<GithubRepo.Item> repolist = null;
+    ArrayList<GithubRepo.Item> repolist = new ArrayList<>();
 
     public RepoAdapter(Context context, ArrayList repolist) {
         this.context = context;

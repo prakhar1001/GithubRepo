@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        //database setup
         mRepoDao = setup_db();
 
         // TODO: 2/28/2017 get arraylist of bookmarked repos from database with their html urls

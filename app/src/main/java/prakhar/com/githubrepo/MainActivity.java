@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<Repo> getFromSQL() {
-        List<Repo> repo_List = mRepoDao.queryBuilder().orderDesc(RepoDao.Properties.Title).build().list();
+        List<Repo> repo_List = mRepoDao.queryBuilder().orderDesc(RepoDao.Properties.Id).build().list();
         //Get the list of all LOGS in Database in descending order
 
         if (repo_List.size() > 0) {  //if list is not null

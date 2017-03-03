@@ -75,11 +75,26 @@ public class GithubRepo implements Parcelable {
         @Expose
         private String htmlUrl;
 
+        Boolean bookmarkStatus = true;
+
+        public Boolean getBookmarkStatus() {
+            return bookmarkStatus;
+        }
+
+        public void setBookmarkStatus(Boolean bookmarkStatus) {
+            this.bookmarkStatus = bookmarkStatus;
+        }
+
         protected Item(Parcel in) {
+            bookmarkStatus = true;
             if (in != null) {
                 fullName = in.readString();
                 htmlUrl = in.readString();
             }
+        }
+
+        Item(){
+            bookmarkStatus = true;
         }
 
         public final Creator<Item> CREATOR = new Creator<Item>() {

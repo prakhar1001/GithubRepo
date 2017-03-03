@@ -63,15 +63,19 @@ public class MainActivity extends AppCompatActivity {
         mRepoDao = setup_db();
 
         // TODO: 2/28/2017 get arraylist of bookmarked repos from database with their html urls
+
         mRepoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
         mRepoListView.setAdapter(mRepoAdapter);
 
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mRepoArrayList != null) {
+                if (mRepoArrayList != null && mRepoArrayList.get(position).getBookmarkStatus() == true) {
+                    mRepoArrayList.get(position).setBookmarkStatus(false);
                     mRepo = new Repo(null, mRepoArrayList.get(position).getFullName(), mRepoArrayList.get(position).getHtmlUrl());
                     saveObjectToSQL(mRepo);
+                } else if (mRepoArrayList.get(position).getBookmarkStatus() == false) {
+                    Toast.makeText(MainActivity.this, "Already Bookmarked Repo", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<Repo> getFromSQL() {
-        List<Repo> repo_List = mRepoDao.queryBuilder().orderDesc(RepoDao.Properties.Id).build().list();
+        List<Repo> repo_List = mRepoDao.queryBuilder().orderDesc(RepoDao.Properties.Title).build().list();
         //Get the list of all LOGS in Database in descending order
 
         if (repo_List.size() > 0) {  //if list is not null
@@ -184,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         mRepoArrayList = savedState.getParcelableArrayList("ParceableRepoList");
         if (mRepoArrayList != null)
             mRepoAdapter.addData(mRepoArrayList);
-
         mGlobalQuery = savedState.getString("query");
 
     }
@@ -248,7 +251,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void saveObjectToSQL(Repo repo_object) {
-        mRepoDao.insert(repo_object);
+        try {
+            mRepoDao.insert(repo_object);
+        } catch (android.database.sqlite.SQLiteConstraintException e) {
+            Toast.makeText(MainActivity.this, "Already Bookmarked Repo", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //Return the Configured LogDao Object

@@ -27,18 +27,6 @@
             android:textStyle="bold"
             app:fontStyleTextView="@string/font_family_open_sans_semi_bold" />
 
-
-        <RatingBar
-            android:id="@+id/ratingBar"
-            style="?android:attr/ratingBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:clickable="true"
-            android:isIndicator="true"
-            android:numStars="1"
-            android:rating="1.0"
-            android:stepSize="1.0" />
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
 

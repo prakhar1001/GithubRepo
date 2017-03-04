@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
     String mGlobalQuery = "Github Repo";
     boolean mRepoListStatus = false;
+    CustomFontTextView mBookmarkDisclaimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mRepoArrayList != null && mRepoArrayList.get(position).getBookmarkStatus() == true) {
                     mRepoArrayList.get(position).setBookmarkStatus(false);
                     mRepo = new Repo(null, mRepoArrayList.get(position).getFullName(), mRepoArrayList.get(position).getHtmlUrl());
+                    Toast.makeText(MainActivity.this, "Success!! Repo " + mRepoArrayList.get(position).getFullName() + " is bookmarked.", Toast.LENGTH_SHORT).show();
                     saveObjectToSQL(mRepo);
                 } else if (mRepoArrayList.get(position).getBookmarkStatus() == false) {
                     Toast.makeText(MainActivity.this, "Already Bookmarked Repo", Toast.LENGTH_SHORT).show();
@@ -95,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        mBookmarkDisclaimer = (CustomFontTextView) findViewById(R.id.bookmark_disclaimer);
     }
 
     public ArrayList<GithubRepo.Item> changeRepoToGithubItem(List<Repo> repo) {
@@ -140,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 dismissProgress();
                 mToolbar.setTitle("Query : " + query);
                 mToolbar.setTitleTextColor(Color.WHITE);
+                mBookmarkDisclaimer.setVisibility(View.VISIBLE);
                 mGlobalQuery = query;
                 mRepoListStatus = true;
                 mRepoArrayList = new ArrayList<GithubRepo.Item>();
@@ -200,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
             mRepoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
             mRepoListView.setAdapter(mRepoAdapter);
             mToolbar.setTitle("Bookmarked Repos");
+            mBookmarkDisclaimer.setVisibility(View.GONE);
             mToolbar.setTitleTextColor(Color.WHITE);
         }
 
@@ -227,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         mToolbar.setTitleTextColor(Color.WHITE);
 
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();

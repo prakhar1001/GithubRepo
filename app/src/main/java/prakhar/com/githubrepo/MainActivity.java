@@ -137,32 +137,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void callGithubRepoAPI(final String query) {
         showProgress();
-        Call<GithubRepo> GithubRepoCall = RetroClient.getInstance().getRetrofit().create(APIInterface.class).GET_REPO_FULLNAME(query);
-        GithubRepoCall.enqueue(new Callback<GithubRepo>() {
-            @Override
-            public void onResponse(Call<GithubRepo> call, Response<GithubRepo> response) {
-                dismissProgress();
-                mToolbar.setTitle("Query : " + query);
-                mToolbar.setTitleTextColor(Color.WHITE);
-                mBookmarkDisclaimer.setVisibility(View.VISIBLE);
-                mGlobalQuery = query;
-                mRepoListStatus = true;
-                mRepoArrayList = new ArrayList<GithubRepo.Item>();
-                mRepoArrayList = (ArrayList<GithubRepo.Item>) response.body().getItems();
-                if (mRepoArrayList.size() > 0) {
-                    mRepoAdapter.addData(mRepoArrayList);
-                } else
-                    Toast.makeText(MainActivity.this, "No Related Repo Found", Toast.LENGTH_LONG).show();
-            }
+        if (NetworkUtils.isNetworkConnected(MainActivity.this)) {
+            Call<GithubRepo> GithubRepoCall = RetroClient.getInstance().getRetrofit().create(APIInterface.class).GET_REPO_FULLNAME(query);
+            GithubRepoCall.enqueue(new Callback<GithubRepo>() {
+                @Override
+                public void onResponse(Call<GithubRepo> call, Response<GithubRepo> response) {
+                    dismissProgress();
+                    mToolbar.setTitle("Query : " + query);
+                    mToolbar.setTitleTextColor(Color.WHITE);
+                    mBookmarkDisclaimer.setVisibility(View.VISIBLE);
+                    mGlobalQuery = query;
+                    mRepoListStatus = true;
+                    mRepoArrayList = new ArrayList<GithubRepo.Item>();
+                    mRepoArrayList = (ArrayList<GithubRepo.Item>) response.body().getItems();
+                    if (mRepoArrayList.size() > 0) {
+                        mRepoAdapter.addData(mRepoArrayList);
+                    } else
+                        Toast.makeText(MainActivity.this, "No Related Repo Found", Toast.LENGTH_LONG).show();
+                }
 
 
-            @Override
-            public void onFailure(Call<GithubRepo> call, Throwable t) {
-                dismissProgress();
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("failure", t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<GithubRepo> call, Throwable t) {
+                    dismissProgress();
+                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("failure", t.getMessage());
+                }
+            });
+        }
+        else{
+            Toast.makeText(MainActivity.this,"Please connect to active Internet. And Retry.",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

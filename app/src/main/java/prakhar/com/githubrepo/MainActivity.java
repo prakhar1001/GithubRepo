@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
         //database setup
         mRepoDao = setup_db();
 
-        // TODO: 2/28/2017 get arraylist of bookmarked repos from database with their html urls
-
         mRepoAdapter = new RepoAdapter(MainActivity.this, changeRepoToGithubItem(getFromSQL()));
         mRepoListView.setAdapter(mRepoAdapter);
 
@@ -162,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -172,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -231,8 +227,7 @@ public class MainActivity extends AppCompatActivity {
         mToolbar.setTitleTextColor(Color.WHITE);
 
     }
-
-
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
